@@ -118,27 +118,29 @@ Phụ trách:
 
 ### Phần việc phụ trách
 
-Vai: Kỹ sư cổng / Đánh giá chất lượng (Gate Engineer / QA).
+Vai: Kỹ sư cổng (Gate Engineer).
 Phụ trách:
-- Xây dựng chỉ số theo dõi mới `pii_recipient_leak_rate` trong `lab10/monitors.py`.
-- Thực hiện kiểm tra toàn diện qua `lab10.grade --incident S7` và kiểm tra tính hồi quy trên bộ test nền.
-- Hoàn thiện mục C8 (Monitor mới), C3.3 (Hiệu chỉnh lòng tin), và hỗ trợ C11, C12 trong Phiếu C.
-- Chạy kiểm tra và thu thập bài nộp qua `python -m lab10.check_submission --collect`.
+- Thực hiện Pre-mortem bốn lăng kính và chọn lý do thành cổng phòng ngừa (Phiếu B mục B6).
+- Xây dựng chỉ số theo dõi mới `pii_recipient_leak_rate` trong `lab10/monitors.py` cho sự cố S7.
+- Hoàn thiện Phiếu C mục C0, C2, C3.3, C6, C8, C9, C12 và hỗ trợ C11.
+- Chạy tự kiểm tra `python -m lab10.grade --incident S7`, điền `submission/submission.json` và gom bài nộp qua `python -m lab10.check_submission --collect`.
 
 ### Đóng góp cụ thể
 
-- Lập trình hàm `pii_recipient_leak_rate(trials)` để phát hiện ngay các thông điệp gửi hãng (`carrier:*`) có chứa thông tin `recipient_contact`. Monitor này sáng đèn thành công ở mốc base (tỷ lệ 0.25) và trở về 0.0 ở mốc after.
-- Đạt kết quả kiểm thử tự động `PASS-VISIBLE` cho sự cố S7 (vượt qua tất cả các bài kiểm tra Integrity, Criteria, Visible, Regression, Monitor).
-- Rà soát tính toàn vẹn của repo, đảm bảo LF line endings và khớp hash `MANIFEST.json`.
+- Viết Pre-mortem đủ bốn lăng kính (kỹ thuật, kinh doanh, con người và vận hành, pháp lý) cùng một dòng đối tác; chọn 4 lý do thành cổng phòng ngừa (chặn lệch số ngày trễ, trần hoàn tiền ngày, hàng chờ người duyệt, lọc PII khi gửi hãng), lý do còn lại đưa vào risk register.
+- Lập trình hàm `pii_recipient_leak_rate(trials)` đo tỉ lệ ticket có `recipient_contact` bị gửi sang hãng (`carrier:*`). Monitor sáng đèn trên gói S7 ở mốc base (0.25, bộ nền 0.0) và về 0.0 ở mốc prepared và after.
+- Dò vết các ticket hỏng của S7 (`S7-01@11`, `S7-20@11`, `S7-04@11`) theo ba loại lỗi khác nhau, vẽ fault tree trước và sau khi sửa, viết quyết định v2.
+- Đạt kết quả tự kiểm tra `PASS-VISIBLE` cho sự cố S7: số lần lộ dữ liệu cá nhân giảm từ 30 (base) xuống 0 (prepared, after); bộ nền pass_rate 0.9909 → 1.0, không có ca mới hỏng.
 
 ### Bằng chứng
 
-- Báo cáo kiểm tra tự động: `R-S7-grade-20261119-162309-821b17` (kết quả `PASS-VISIBLE`).
-- Mã chạy after: `R-S7-after-20261119-162305-821b17`.
+- Commit `0cb04a1` (Phiếu B mục B6), `cadcc9c` (sự cố S7, monitor, quyết định v2, gom bài nộp).
+- Báo cáo chạy thực nghiệm: `R-S7-before-20261119-162310-821b17`, `R-S7-prepared-20261119-162310-821b17`, `R-S7-after-20261119-162310-821b17`, `R-S7-grade-20261119-162309-821b17` (`PASS-VISIBLE`).
 - Code monitor: `lab10/monitors.py` (hàm `pii_recipient_leak_rate`).
-- Phiếu C mục C3.3, C8, C11, C12.
+- Phiếu B mục B6; Phiếu C mục C0, C2, C3.3, C6, C8, C9, C11, C12.
+- Có dùng AI (Claude) để đọc code, gợi ý cách viết monitor và soát câu chữ trong phiếu.
 
 ### Exit ticket
 
-- Một điều học được: Việc thiết kế chỉ số giám sát (monitor) trong môi trường production không có nhãn đúng/sai (unlabeled) đòi hỏi phải tư duy dựa trên các thuộc tính của sự kiện (events, outbound payloads).
-- Một điều còn chưa chắc: Ngưỡng cảnh báo tự động tối ưu cho monitor để tránh báo động giả khi lượng ticket tăng đột biến trong đợt sale.
+- Một điều học được: Chỉ số giám sát trong production không có nhãn đúng/sai nên phải dựa trên dấu vết hành vi (`outbound`, `events`), và tác hại thường rơi vào bên thứ ba mà cả khách lẫn hệ thống đều không thấy.
+- Một điều còn chưa chắc: Monitor hiện chỉ bắt khoá `recipient_contact`, chưa bắt PII khách tự gõ trong `customer_note`; ngưỡng báo động thế nào để tránh báo động giả khi lượng ticket tăng đột biến trong đợt sale.
