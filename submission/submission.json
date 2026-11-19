@@ -1,12 +1,17 @@
 {
-  "team": "",
-  "members": [],
-  "incident": "",
-  "decision_v1": "",
-  "decision_v2": "",
+  "team": "K5-L3B-DAY10-Nhom001-PoCtoPilotGate1",
+  "members": [
+    "CaoDuyMinh-2A202603988",
+    "HoangTheDuyet-2A202603980",
+    "NguyenKhacBao-2A202604072",
+    "HoangNhatMinh-2A202603992"
+  ],
+  "incident": "S7",
+  "decision_v1": "Tiếp tục",
+  "decision_v2": "Tiếp tục",
   "three_lines": {
-    "environment_assumption": "",
-    "reduce_or_prevent": "",
-    "measure_in_pilot": ""
+    "environment_assumption": "Hãng vận chuyển bên thứ ba và tài xế chỉ dùng dữ liệu thông báo trễ để cải thiện chất lượng dịch vụ nội bộ mà không tự ý tra cứu liên hệ người nhận để gọi điện làm phiền.",
+    "reduce_or_prevent": "Cổng ghi write_gate thực sự NGĂN HẲN tác hại vì sử dụng cơ chế allowlist carrier_notice_fields cứng kết hợp loại bỏ triệt để recipient_contact và customer_note trước khi gửi đối tác.",
+    "measure_in_pilot": "Cần đo lại tỷ lệ phản ánh thực tế từ người nhận quà qua các kênh khiếu nại bên ngoài và mức độ tuân thủ bảo mật dữ liệu của các hãng vận chuyển đối tác."
   }
 }
