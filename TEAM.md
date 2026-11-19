@@ -59,20 +59,23 @@ Phụ trách:
 
 Vai: Vận hành và pháp lý (Ops & Legal).
 Phụ trách:
-- Thiết lập cổng vận hành và pháp lý trong `config/operating_gates.json`.
-- Hoàn thiện phân tích Concept Drift (B3), HAZOP (B4), Checklist 9 nhóm việc (B5, C11).
-- Phân tích pháp lý sự cố S7 (Nghị định 13/2023/NĐ-CP về bảo vệ dữ liệu cá nhân, điều khoản chia sẻ dữ liệu hợp đồng đối tác DPA).
+- Phiếu A: câu 1.2 (mục tiêu nhìn từ chị Oanh và chị Hạnh), câu 1.4 (telemetry production).
+- Phiếu B: câu 2.4 (B4 HAZOP vòng 1 trên `file_carrier_fault`, B5 checklist 9 nhóm việc); câu 2.10 (B7.5 runbook phần 1–3, B7.6 giờ cao điểm).
+- `config/operating_gates.json` mục `operations` và `legal`.
+- Phiếu C, thẻ S7 (pháp lý): rà và sửa C4 (HAZOP của thẻ), C11 (cập nhật checklist, kịch bản giờ cao điểm ở Runbook 5); PIC dòng Risk register C10.
 
 ### Đóng góp cụ thể
 
-- Đề xuất bổ sung cổng pháp lý `pii_fields_blocked_to_third_party: ["recipient_contact", "customer_note"]` và thiết lập điều kiện dừng khẩn cấp cho nhân sự vận hành (`NV-TUNG`, `NV-HANH`).
-- Viết kịch bản xử lý sự cố trong Runbook (phần 4–5) khi phát sinh rò rỉ dữ liệu cá nhân ra bên thứ ba.
-- Soát lỗi hợp đồng vận chuyển: chỉ cho phép chia sẻ cấp quận/huyện (`district`), không chia sẻ địa chỉ chi tiết và số điện thoại người nhận quà.
+- Đặt cổng pháp lý vòng 1 `legal.pii_fields_blocked_to_third_party = ["recipient_contact", "customer_note"]` và `carrier_fault_requires_recorded_cause = true`, trước khi biết sự cố. Trên gói S7, số lần lộ dữ liệu cá nhân cho hãng giảm từ 30 (base) xuống 0 (prepared), cùng với cổng allowlist của Kỹ sư cổng.
+- Đặt mục `operations`: PIC `NV-TUNG`, người duyệt `NV-HANH`, 1 người trực × 6 ca/giờ, chờ tối đa 60 phút, 5 điều kiện dừng, kênh `#logix-refund-pilot`; chạy kiểm `R-base-after-20261119-153807-4bc37a`: không có ca mới hỏng.
+- HAZOP vòng 1 tìm ra nhánh chưa thấy trên trace: chính sách REFUND-v4 (từ 2026-12-01) không coi bất khả kháng là lỗi hãng; và hai trường `recipient_contact`, `customer_note` mà `lab10/agent.py` gửi cho hãng ngoài `carrier_notice_fields`.
+- Tính chi phí giờ cao điểm: thêm 1 người trực (30.000đ/ca) với 22 ticket/ngày đẩy chi phí lên ≈ 5.567đ/ticket, vượt trần 5.000đ đã ký; chỉ thêm người khi ≥ 38 ticket/ngày.
 
 ### Bằng chứng
 
-- Commit `a7d3386` (Form B B3), `827f74b` (Form B B4, B5), `bc01a32` (cấu hình operating_gates.json).
-- Phiếu B mục B3, B4, B5; Phiếu C mục C4, C5, C10, C11.
+- Commit `7f07a83` (Phiếu A câu 1.2, 1.4), `827f74b` (Phiếu B B4, B5), `584dc46` (`operating_gates.json` mục `operations`, `legal`; runbook B7.5, B7.6; cập nhật B5).
+- Mã lần chạy `R-base-after-20261119-153807-4bc37a` (kiểm config vòng 1); report tự kiểm tra S7: dòng "pháp lý: lần lộ dữ liệu cá nhân cho bên thứ ba" base 30 → prepared 0.
+- Phiếu A mục A1, A2; Phiếu B mục B4, B5, B7.5, B7.6; Phiếu C mục C4, C11.
 
 ### Exit ticket
 
