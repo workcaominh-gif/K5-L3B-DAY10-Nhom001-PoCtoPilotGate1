@@ -2,9 +2,9 @@
 
 ## Thông tin nhóm
 
-- Tên nhóm (`TenNhom`, không dấu, không khoảng trắng):
-- Lớp: `L3A` / `L3B`
-- Repo của bàn: `K5-<L3A|L3B>-DAY10-<TenNhom>-PoCtoPilotGate1`
+- Tên nhóm (`TenNhom`, không dấu, không khoảng trắng): Nhom001
+- Lớp: `L3B`
+- Repo của bàn: `K5-L3B-DAY10-Nhom001-PoCtoPilotGate1` (https://github.com/workcaominh-gif/K5-L3B-DAY10-Nhom001-PoCtoPilotGate1)
 - Thẻ sự cố đã bốc (S1–S8):
 
 ## Thành viên
@@ -13,10 +13,10 @@ Họ tên đầy đủ và MSSV của **mọi** thành viên; bàn 3 người th
 
 | STT | Họ và tên | MSSV | Vai | Trưởng nhóm |
 | --: | --------- | ---- | --- | :---------: |
-|   1 |           |      |     |             |
-|   2 |           |      |     |             |
-|   3 |           |      |     |             |
-|   4 |           |      |     |             |
+|   1 | Cao Duy Minh | 2A202603988 | Sản phẩm và kinh doanh | ✔ |
+|   2 | Hoàng Thế Duyệt | 2A202603980 | Vận hành và pháp lý | |
+|   3 | Nguyễn Khắc Bào | 2A202604072 | Kỹ sư cổng | |
+|   4 | Hoàng Nhật Minh | 2A202603992 | Kỹ sư cổng | |
 
 Ghi `members` trong `submission/submission.json` theo dạng `"HoVaTen-MSSV"`, khớp bảng trên.
 
