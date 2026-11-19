@@ -6,7 +6,7 @@
 - Lớp: `L3B`
 - Repo của bàn: `K5-L3B-DAY10-Nhom001-PoCtoPilotGate1` (https://github.com/workcaominh-gif/K5-L3B-DAY10-Nhom001-PoCtoPilotGate1)
 - Eval card và PRD v1.1 dùng chung (Lab 9, bản của Cao Duy Minh): [eval_card.md](https://github.com/workcaominh-gif/K5-L3B-DAY09-CaoDuyMinh-2A202603988-EvaluationandFailureAnalysis/blob/main/docs/eval_card.md) · [PRD_v1.1.md](https://github.com/workcaominh-gif/K5-L3B-DAY09-CaoDuyMinh-2A202603988-EvaluationandFailureAnalysis/blob/main/docs/PRD_v1.1.md)
-- Thẻ sự cố đã bốc (S1–S8):
+- Thẻ sự cố đã bốc (S1–S8): S7
 
 ## Thành viên
 
