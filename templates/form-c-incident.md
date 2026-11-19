@@ -224,8 +224,12 @@ thường biến một nhánh HOẶC thành VÀ: tác hại chỉ còn xảy ra 
  │ └─ vì: Code agent kiểm tra đơn quà tặng (order.is_gift) và tự ý chèn recipient_contact={"name":..., "phone":...} | bằng chứng: ticket S7-20@seed 11, dòng trace 07
  ├─ [2] Agent forward nguyên văn văn bản ticket của khách hàng sang hãng | tầng: đầu vào / hành động
  │ └─ vì: Khách gõ SĐT và địa chỉ người nhận vào ticket, agent gán thẳng vào customer_note gửi đối tác | bằng chứng: ticket S7-01@seed 11, dòng trace 07
- └─ [3] Hệ thống không có bộ lọc dữ liệu đầu ra ở lệnh gọi tool notify_carrier | tầng: quyền hạn / kỹ thuật
- └─ vì: Thiếu gate kiểm tra tính tuân thủ của payload với thỏa thuận hợp đồng carrier_notice_fields | bằng chứng: report R-S7-before-20261119-162310-821b17 dòng pii_leaks: 30
+ ├─ [3] Hệ thống không có bộ lọc dữ liệu đầu ra ở lệnh gọi tool notify_carrier | tầng: quyền hạn / kỹ thuật
+ │ └─ vì: Thiếu gate kiểm tra tính tuân thủ của payload với thỏa thuận hợp đồng carrier_notice_fields | bằng chứng: report R-S7-before-20261119-162310-821b17 dòng pii_leaks: 30
+ └─ [4] Không ai trong quy trình chặn hay phát hiện trước khi người nhận phản ánh | tầng: con người / quy trình (ngoài kỹ thuật)
+    └─ VÀ
+    ├─ [4a] Quyết định sản phẩm cho gửi liên hệ người nhận để hãng "gọi xin lỗi", không hỏi người nhận, không đối chiếu điều khoản dữ liệu của hợp đồng hãng | bằng chứng: `lab10/agent.py` dòng 203 (`if order.get("is_gift"): # "so the carrier can apologise to the recipient"`), trái `policies[].carrier_notice_fields` (4 trường)
+    └─ [4b] Không có ai kiểm mẫu thông báo gửi hãng nên lỗi lặp lại tới khi Pháp chế nhận email | bằng chứng: `config/operating_gates.round1.json` → `operations.review_sampling_pct = 0`; checklist B5 chưa có dòng "kiểm mẫu dữ liệu gửi bên thứ ba"
 ```
 
 | Lá | Specification bị vi phạm (phần mềm phải làm gì) | Giả định môi trường đã sai (thế giới ngoài phần mềm) |
@@ -233,6 +237,7 @@ thường biến một nhánh HOẶC thành VÀ: tác hại chỉ còn xảy ra 
 | [1] | Payload gửi bên thứ ba chỉ chứa thông tin bưu kiện và địa bàn (cấp quận/huyện), không được gửi thông tin liên hệ cá nhân | Tin rằng đơn quà tặng thì hãng cần số người nhận để gọi xin lỗi |
 | [2] | Phải bóc tách hoặc lược bỏ văn bản tự do của người dùng trước khi gửi cho hệ thống đối tác thứ ba | Tin rằng khách hàng chỉ gõ lý do khiếu nại thuần túy, không để lại PII nhạy cảm |
 | [3] | Cổng ghi phải cưỡng chế allowlist trường hợp đồng trước khi phát tán dữ liệu ra ngoài biên hệ thống | Tin rằng model và mã nguồn agent luôn tuân thủ đúng chính sách hợp đồng |
+| [4] | Mọi trường mới gửi cho bên thứ ba phải qua Pháp chế duyệt và có người kiểm mẫu đầu ra định kỳ (ví dụ ≥ 10% thông báo gửi hãng mỗi ngày) | Tin rằng người nhận quà đồng ý để hãng liên hệ, và tin rằng hãng chỉ dùng thông tin để xin lỗi chứ không làm phiền hay lưu lại |
 
 **Ví dụ mẫu một nhánh (bộ nền, đừng chép):** đỉnh "hãng VNX nhận lỗi oan cho đơn O-1002" ← [1] agent dùng độ trễ 5 ngày ←
 model lấy số trong ticket đè lên DB (`T-002@55`). Spec bị vi phạm: độ trễ dùng để ghi lỗi phải lấy từ tracking DB. Giả định
