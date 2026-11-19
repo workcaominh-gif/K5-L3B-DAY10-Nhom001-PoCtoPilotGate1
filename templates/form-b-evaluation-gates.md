@@ -253,11 +253,11 @@ Bốn lăng kính (bắt buộc đủ cả bốn; dự án AI hay chết ở ba 
 
 | Lý do thất bại (viết ở thì quá khứ) | Lăng kính | Kiểm được hôm nay? (trace / data / config nào) | Thành cổng phòng ngừa nào (code hay config) / hay vào risk register |
 |---|---|---|---|
-| | Kỹ thuật | | |
-| | Kinh doanh | | |
-| | Con người và vận hành | | |
-| | Pháp lý | | |
-| | | | |
+| Model đã tin số ngày trễ do khách tự khai thay vì so khớp với tracking DB (`T-002@55`), dẫn đến hoàn sai tiền cho khách và ghi phạt oan cho đối tác vận chuyển; hoặc model áp dụng sai phiên bản chính sách đã hết hạn (`REFUND-v3` thay vì `v4`). | Kỹ thuật | Trace `T-002@55` bước `03 model_override`; `data/world.json` mục `policies`; `test_helpers`. | **Thành cổng phòng ngừa (Code)**: Nhánh trong `lab10/guards.py` (`write_gate`) chặn `issue_refund` và `file_carrier_fault` nếu số ngày trễ khác DB tracking. |
+| Tổng số tiền hoàn tự động trong ngày đã vượt ngân sách cho phép do thiếu trần chặn ngày (`daily_refund_cap_vnd`), làm thâm hụt ngân sách bồi thường của Finance; hoặc pilot mở rộng vào các kho sỉ giá trị lớn (`HCM-B2B`) khiến rủi ro tài chính vượt quá khả năng chịu đựng. | Kinh doanh | Báo cáo `lab10.gate` dòng `trần bàn đặt: chưa đặt`; `data/world.json` mục `ops_limits.daily_auto_refund_budget_vnd = 2000000`. | **Thành cổng phòng ngừa (Config)**: Đặt `business.daily_refund_cap_vnd = 1500000` và `business.pilot_scope` (chỉ chạy depot thường, loại `HCM-B2B`). |
+| Vào giờ cao điểm, lượng ticket dồn gấp 3 khiến tỉ lệ chuyển duyệt (~23%) làm dồn 7-8 ca/giờ vượt quá công suất của 1 reviewer (6 ca/giờ), hàng chờ ngập quá 60 phút vi phạm SLA (`queue_stuck > 0`), CSKH kiệt sức và mất niềm tin vào trợ lý. | Con người và vận hành | Output eval: `hàng chờ người duyệt: 1 người trực · duyệt được 6 ca/giờ`; `data/world.json` mục `ops_facts.default_reviewers_on_shift = 1`. | **Thành cổng phòng ngừa (Config + Runbook)**: Điền `operations.reviewers_on_shift = 1`, `operations.max_queue_wait_minutes = 60`, và viết quy trình Runbook gọi thêm người khi hàng chờ quá 5 ca. |
+| Tool `notify_carrier` đã gửi nguyên văn lời nhắn của khách (`customer_note`) và thông tin liên hệ của người nhận quà (`recipient_contact` ở đơn quà O-1024, O-1026) cho hãng vận chuyển bên thứ ba mà không có sự đồng ý, vi phạm nghiêm trọng quy định bảo vệ dữ liệu cá nhân (PII). | Pháp lý | Log trace `08 tool: notify_carrier` đơn O-1002 và O-1024; trường `legal.pii_fields_blocked_to_third_party` trong `config/operating_gates.json` đang trống. | **Thành cổng phòng ngừa (Config + Code)**: Đặt `legal.pii_fields_blocked_to_third_party = ["recipient_contact", "customer_note"]` và code lọc sạch PII trong `write_gate` khi gọi `notify_carrier`. |
+| Hãng vận chuyển nhỏ (như GHSH có 12 tài xế) bị trợ lý tự động phạt quá 3 lỗi trong 7 ngày do các lỗi giao trễ do bất khả kháng (mùa bão miền Trung), dẫn đến bị đình chỉ hợp tác oan uổng và khiếu kiện kéo dài làm đứt gãy chuỗi giao vận. | Đối tác / Vận hành | B4 HAZOP dòng INVALID và `data/world.json` mục `carriers[].suspend_after_strikes_7d`. | **Vào Risk register** (theo dõi và kiểm soát bằng cổng `carrier_fault_requires_recorded_cause = true` và giám sát ngưỡng đình chỉ). |
 
 ---
 
