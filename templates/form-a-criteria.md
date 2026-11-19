@@ -24,8 +24,8 @@ rồi mới chạy đánh giá. Khối 1 không sửa code.
 
 ### Câu 1.2 · Mục tiêu nhìn từ hai người
 
-- Chị Oanh, kế toán đối soát (không dùng trợ lý, nhưng phải khớp sổ với hãng và shop mỗi tuần): …
-- Chị Hạnh, trưởng ca CSKH (phải duyệt những ca trợ lý chuyển sang): …
+- Chị Oanh, kế toán đối soát (không dùng trợ lý, nhưng phải khớp sổ với hãng và shop mỗi tuần): mỗi khoản hoàn tiền và mỗi lỗi ghi cho hãng do trợ lý tạo ra phải khớp một-một với sổ của hãng và shop khi đối soát cuối tuần (có `order_id`, số tiền, chính sách áp dụng, lý do, người duyệt nếu có), để 100% khoản trợ lý ghi trong tuần đối soát được mà không phải sửa tay, không phải đòi lại tiền hoàn sai và không phải xin lỗi hãng vì lỗi ghi oan (`staff` NV-OANH; PRD v1.1 §2, §6).
+- Chị Hạnh, trưởng ca CSKH (phải duyệt những ca trợ lý chuyển sang): trợ lý chỉ chuyển sang đúng những ca cần người (hoàn tự động cho một khách vượt 300.000đ/ngày, lỗi thứ 3 của cùng một hãng trong ngày, thiếu phê duyệt hợp lệ), mỗi ca kèm ghi chú giải thích để kiểm lại chỉ tốn khoảng 0,4 ca, không ca nào chờ quá 60 phút (`ops_limits.review_sla_minutes`) và lượng ca chuyển không vượt sức duyệt 6 ca/giờ/người (`ops_facts`), để ca trực không bị ùn (`staff` NV-HANH; PRD v1.1 §2, §6).
 
 ---
 
@@ -48,12 +48,12 @@ trợ lý có đang gây thiệt hại cho bên ngoài LogiX không; không có 
 
 | | Offline, cho MỘT bước (câu 1.3) | Telemetry production (câu 1.4) |
 |---|---|---|
-| **Bước / hành vi được đo** | | |
-| **Thước đo** (một câu, có đơn vị) | | |
-| **Dữ liệu** (lấy ở đâu, bao nhiêu, ai gán nhãn) | | |
-| **Cách tính** (công thức, mẫu số, cách xử lý ca thiếu dữ liệu) | | |
-| **Khung thời gian / ngưỡng báo động** | (không áp dụng) | |
-| **Điểm mù** (thước đo này KHÔNG thấy gì) | | |
+| **Bước / hành vi được đo** | | Các lệnh ghi đi ra ngoài LogiX khi chạy pilot với khách thật: `issue_refund` (tiền vào sổ cái), `file_carrier_fault` (ghi lỗi cho hãng), `notify_carrier`, `send_reply` (tin gửi khách/hãng, có thể lộ dữ liệu cá nhân) |
+| **Thước đo** (một câu, có đơn vị) | | Số hành động ghi tự động bị bên ngoài phản đối hoặc phải đảo ngược (hãng khiếu nại lỗi ghi oan, kế toán điều chỉnh/thu hồi khoản hoàn, tin gửi đi chứa dữ liệu cá nhân của bên thứ ba) trên 100 hành động ghi tự động, tách theo từng hãng và từng kho |
+| **Dữ liệu** (lấy ở đâu, bao nhiêu, ai gán nhãn) | | Không có nhãn trong production, dùng tín hiệu thay nhãn: log hành động ghi (trace, sổ cái `ledger`) của toàn bộ ticket pilot; phiếu khiếu nại của hãng vận chuyển; kết quả đối soát hằng tuần của chị Oanh (NV-OANH) với hãng và shop; quét tự động (regex SĐT, địa chỉ, email, tên khách) trên mọi tin `send_reply`/`notify_carrier`; khách mở lại ticket. Nhãn trễ: chị Hạnh (NV-HANH) kiểm mẫu ngẫu nhiên một phần ca tự động mỗi ca trực |
+| **Cách tính** (công thức, mẫu số, cách xử lý ca thiếu dữ liệu) | | Tỉ lệ = 100 × (số hành động ghi tự động bị khiếu nại / bị điều chỉnh khi đối soát / bị quét ra dữ liệu cá nhân) ÷ (tổng hành động ghi tự động trong khung thời gian), tính riêng cho từng tool, từng hãng, từng kho. Một hành động dính nhiều tín hiệu chỉ đếm một lần. Hành động chưa hết hạn đối soát hoặc chưa hết hạn khiếu nại được đếm riêng là "chưa xác định", không tính là đúng; ca chuyển người duyệt không nằm trong mẫu số |
+| **Khung thời gian / ngưỡng báo động** | (không áp dụng) | Dữ liệu cá nhân: theo giờ, ≥ 1 tin lộ → báo động ngay, tắt `send_reply`. Lỗi ghi cho hãng: theo ngày, > 2 lỗi tự động cho cùng một hãng trong ngày (`ops_limits.max_auto_strikes_per_carrier_per_day`) hoặc ≥ 1 khiếu nại lỗi ghi oan → chặn và báo NV-TUNG. Hoàn tiền: đối soát theo tuần, ≥ 1 khoản hoàn sai → kích hoạt `stop_condition` đã ký (NV-TUNG tắt tool tương ứng trong 15 phút). Tổng hoàn tự động trong ngày chạm 2.000.000đ (`daily_auto_refund_budget_vnd`) → báo động, phần còn lại chuyển người duyệt |
+| **Điểm mù** (thước đo này KHÔNG thấy gì) | | Tác hại mà không ai lên tiếng: hãng không khiếu nại lỗi ghi oan, khách bị từ chối hoàn sai rồi bỏ đi không mở lại ticket. Đối soát chạy theo tuần nên khoản hoàn sai có thể trễ tới 7 ngày mới thấy. Regex không bắt được dữ liệu cá nhân viết lách (ví dụ số điện thoại viết bằng chữ). Không thấy thiệt hại nội bộ như hàng chờ người duyệt bị ùn |
 
 **Ví dụ mẫu (bước "chọn độ trễ" của agent, đừng chép):**
 Thước đo: tỉ lệ lần chạy mà độ trễ agent dùng để tính tiền khác độ trễ theo tracking DB. Dữ liệu: sự kiện `proposal.delay_days_used`
